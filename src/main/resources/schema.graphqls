@@ -69,9 +69,15 @@ type FlightEdge {
     node: Flight
 }
 
+directive @skipcodegen on FIELD_DEFINITION
+
 type FlightConnection {
     edges: [FlightEdge!]!
     pageInfo: PageInfo!
+    """
+    Alternative how not to include the property in the generated code.
+    """
+    totalCount: Int! @skipcodegen
 }
 
 input FlightsFilter {

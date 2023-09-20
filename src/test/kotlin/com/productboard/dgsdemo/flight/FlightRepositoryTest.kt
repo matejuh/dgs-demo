@@ -23,4 +23,9 @@ class FlightRepositoryTest : DgsDemoApplicationTests() {
             )
             .containsExactly("OK-6400")
     }
+
+    @Test
+    fun `Should get count with filter`() {
+        assertThat(flightRepository.count(FlightsFilter(plane = "OK-6400"))).isEqualTo(4)
+    }
 }

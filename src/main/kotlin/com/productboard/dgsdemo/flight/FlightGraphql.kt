@@ -1,8 +1,11 @@
 package com.productboard.dgsdemo.flight
 
 import com.netflix.graphql.dgs.DgsComponent
+import com.netflix.graphql.dgs.DgsData
+import com.netflix.graphql.dgs.DgsDataFetchingEnvironment
 import com.netflix.graphql.dgs.DgsQuery
 import com.netflix.graphql.dgs.InputArgument
+import com.productboard.dgsdemo.dgs.DgsConstants
 import com.productboard.dgsdemo.dgs.types.Flight
 import com.productboard.dgsdemo.dgs.types.FlightConnection
 import com.productboard.dgsdemo.dgs.types.FlightEdge
@@ -38,6 +41,12 @@ class FlightFetcher(private val flightRepository: FlightRepository) {
                 )
             }
             .let { DataFetcherResult.Builder<FlightConnection>().data(it).localContext(filter).build() }
+
+    @DgsData(parentType = DgsConstants.FLIGHTCONNECTION.TYPE_NAME, field = DgsConstants.FLIGHTCONNECTION.TotalCount)
+    fun flightsTotalCount(dfe: DgsDataFetchingEnvironment): Int {
+        val filter = dfe.getLocalContext<GraphqlFlightsFilter>()
+        return flightRepository.count(filter.toDto())
+    }
 }
 
 private fun DtoFlight.toGraphql(): Flight =

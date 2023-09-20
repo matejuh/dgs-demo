@@ -51,4 +51,25 @@ class FlightGraphqlTest : DgsDemoApplicationTests() {
             response.extractValueAsObject("data.listFlights.edges[*].node.plane.type", jsonTypeRef<List<String>>())
         assertThat(types.distinct()).containsExactly("Std. Cirrus")
     }
+
+    @Test
+    fun `Should get flights edges and total count`() {
+        val countQuery =
+            graphQLClient.executeQuery(
+                """
+            query CountFlights {
+                listFlights(first: 2, filter: { plane: "OK-6400" }) {
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                    totalCount
+                }
+            }
+            """
+            )
+        assertThat(countQuery.extractValueAsObject("data.listFlights.totalCount", Int::class.java)).isEqualTo(4)
+        assertThat(countQuery.extractValueAsObject("data.listFlights.edges.length()", Int::class.java)).isEqualTo(2)
+    }
 }
