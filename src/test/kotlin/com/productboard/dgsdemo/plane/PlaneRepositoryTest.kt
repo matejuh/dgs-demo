@@ -20,4 +20,14 @@ class PlaneRepositoryTest : DgsDemoApplicationTests() {
         assertThat(plane.sign).isEqualTo("OK-7427")
         assertThat(planeRepository.get("OK-7427")).isNotNull
     }
+
+    @Test
+    fun `Should get by ids`() {
+        assertThat(
+                planeRepository.getByIds(setOf("OK-ZCA", "OK-JSC", "OK-7241", "OK-6400")).mapValues { it.value.type }
+            )
+            .containsAllEntriesOf(
+                mapOf("OK-ZCA" to "Z-526L", "OK-JSC" to "Z-42", "OK-7241" to "Std. Cirrus", "OK-6400" to "Std. Cirrus")
+            )
+    }
 }

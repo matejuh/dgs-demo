@@ -20,5 +20,13 @@ class PlaneRepository(private val jooqContext: DSLContext) {
             .returningResult(DSL.asterisk())
             .fetchOne { deserializePlane(it) }!!
 
+    fun getByIds(keys: Set<PlaneSign>): Map<PlaneSign, Plane> =
+        jooqContext
+            .select(DSL.asterisk())
+            .from(PLANES)
+            .where(PLANES.SIGN.`in`(keys))
+            .fetch { deserializePlane(it) }
+            .associateBy { it.sign }
+
     private fun deserializePlane(record: Record): Plane = Plane(sign = record[PLANES.SIGN], type = record[PLANES.TYPE])
 }
