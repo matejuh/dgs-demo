@@ -73,7 +73,10 @@ tasks.withType<Test> {
 tasks.withType<com.netflix.graphql.dgs.codegen.gradle.GenerateJavaTask> {
     schemaPaths = mutableListOf("$projectDir/src/main/resources/schema.graphqls")
     packageName = "com.productboard.dgsdemo.dgs"
-    generateClientv2 = true
+    language = "kotlin"
+    generateClient = true
+    generateKotlinNullableClasses = true
+    generateKotlinClosureProjections = true
     typeMapping = mutableMapOf(
         "ISO8601DateTime" to "java.time.LocalDateTime",
     )

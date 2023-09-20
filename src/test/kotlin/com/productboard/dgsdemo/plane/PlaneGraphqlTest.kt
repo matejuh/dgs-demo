@@ -1,10 +1,8 @@
 package com.productboard.dgsdemo.plane
 
 import com.netflix.graphql.dgs.DgsQueryExecutor
-import com.netflix.graphql.dgs.client.codegen.GraphQLQueryRequest
 import com.productboard.dgsdemo.DgsDemoApplicationTests
-import com.productboard.dgsdemo.dgs.client.AddPlaneGraphQLQuery
-import com.productboard.dgsdemo.dgs.client.AddPlaneProjectionRoot
+import com.productboard.dgsdemo.dgs.DgsClient
 import com.productboard.dgsdemo.dgs.types.AddPlaneInput
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -16,24 +14,25 @@ class PlaneGraphqlTest : DgsDemoApplicationTests() {
     @Test
     fun `Should add plane`() {
         val mutation =
-            GraphQLQueryRequest(
-                AddPlaneGraphQLQuery.newRequest().input(AddPlaneInput(sign = "OK-4832", type = "L-13")).build(),
-                AddPlaneProjectionRoot<Nothing, Nothing>().onAddPlaneSuccess().plane().sign()
-            )
-        assertThat(
-                dgsQueryExecutor.executeAndExtractJsonPath<PlaneSign>(mutation.serialize(), "data.addPlane.plane.sign")
-            )
+            DgsClient.buildMutation {
+                addPlane(input = AddPlaneInput(sign = "OK-4832", type = "L-13")) {
+                    onAddPlaneSuccess { plane { sign } }
+                }
+            }
+        assertThat(dgsQueryExecutor.executeAndExtractJsonPath<PlaneSign>(mutation, "data.addPlane.plane.sign"))
             .isEqualTo("OK-4832")
     }
 
     @Test
     fun `Should return already existing on add`() {
         val mutation =
-            GraphQLQueryRequest(
-                AddPlaneGraphQLQuery.newRequest().input(AddPlaneInput(sign = "OK-7761", type = "Discus 2b")).build(),
-                AddPlaneProjectionRoot<Nothing, Nothing>().onPlaneAlreadyExists().plane().type()
-            )
-        assertThat(graphQLClient.executeQuery(mutation.serialize()).extractValue<String>("data.addPlane.plane.type"))
+            DgsClient.buildMutation {
+                addPlane(input = AddPlaneInput(sign = "OK-7761", type = "Discus 2b")) {
+                    onPlaneAlreadyExists { plane { type } }
+                }
+            }
+
+        assertThat(graphQLClient.executeQuery(mutation).extractValue<String>("data.addPlane.plane.type"))
             .isEqualTo("Duo Discus")
     }
 }

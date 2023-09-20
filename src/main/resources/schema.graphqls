@@ -55,10 +55,7 @@ type Flight implements Node @key(fields: "id") {
     startTime: ISO8601DateTime!
     landingTime: ISO8601DateTime!
     planeSign: String!
-    """
-    Optional because of Kotlin codegen limitations: https://netflix.github.io/dgs/advanced/kotlin-codegen/
-    """
-    plane: Plane
+    plane: Plane!
 }
 
 type FlightEdge {
@@ -69,15 +66,10 @@ type FlightEdge {
     node: Flight
 }
 
-directive @skipcodegen on FIELD_DEFINITION
-
 type FlightConnection {
     edges: [FlightEdge!]!
     pageInfo: PageInfo!
-    """
-    Alternative how not to include the property in the generated code.
-    """
-    totalCount: Int! @skipcodegen
+    totalCount: Int!
 }
 
 input FlightsFilter {

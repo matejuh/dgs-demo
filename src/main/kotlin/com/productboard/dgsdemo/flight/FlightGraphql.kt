@@ -34,17 +34,22 @@ class FlightFetcher(private val flightRepository: FlightRepository) {
             .list(first, after, filter.toDto())
             .let {
                 FlightConnection(
-                    edges =
+                    edges = {
                         it.nodes.map { flight ->
-                            FlightEdge(node = flight.toGraphql(), cursor = flight.startTime.toString())
-                        },
-                    pageInfo =
-                        PageInfo(
-                            hasNextPage = it.hasNextPage,
-                            hasPreviousPage = it.hasPreviousPage,
-                            startCursor = it.nodes.firstOrNull()?.id.toString(),
-                            endCursor = it.nodes.lastOrNull()?.id.toString()
-                        )
+                            FlightEdge.Builder()
+                                .withNode(flight.toGraphql())
+                                .withCursor(flight.startTime.toString())
+                                .build()
+                        }
+                    },
+                    pageInfo = {
+                        PageInfo.Builder()
+                            .withHasNextPage(it.hasNextPage)
+                            .withHasPreviousPage(it.hasPreviousPage)
+                            .withStartCursor(it.nodes.firstOrNull()?.id.toString())
+                            .withEndCursor(it.nodes.lastOrNull()?.id.toString())
+                            .build()
+                    }
                 )
             }
             .let { DataFetcherResult.Builder<FlightConnection>().data(it).localContext(filter).build() }
@@ -76,6 +81,6 @@ class FlightsDataLoader(private val flightRepository: FlightRepository, private 
 }
 
 private fun DtoFlight.toGraphql(): Flight =
-    Flight(id = id.toString(), startTime = startTime, landingTime = landingTime, planeSign = planeSign)
+    Flight(id = { id.toString() }, startTime = { startTime }, landingTime = { landingTime }, planeSign = { planeSign })
 
 private fun GraphqlFlightsFilter?.toDto(): DtoFlightsFilter? = this?.let { DtoFlightsFilter(plane = it.plane) }
