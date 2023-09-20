@@ -27,4 +27,28 @@ class FlightGraphqlTest : DgsDemoApplicationTests() {
         val ids = response.extractValueAsObject("data.listFlights.edges[*].node.id", jsonTypeRef<List<String>>())
         assertThat(ids).hasSize(10)
     }
+
+    @Test
+    fun `Should list with filter`() {
+        val response =
+            graphQLClient.executeQuery(
+                """
+            query ListFlights {
+                listFlights(first: 10, filter: { plane: "OK-6400" }) {
+                    edges {
+                        node {
+                            plane {
+                                type
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            )
+
+        val types =
+            response.extractValueAsObject("data.listFlights.edges[*].node.plane.type", jsonTypeRef<List<String>>())
+        assertThat(types.distinct()).containsExactly("Std. Cirrus")
+    }
 }

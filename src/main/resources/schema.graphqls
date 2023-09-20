@@ -55,6 +55,10 @@ type Flight implements Node @key(fields: "id") {
     startTime: ISO8601DateTime!
     landingTime: ISO8601DateTime!
     planeSign: String!
+    """
+    Optional because of Kotlin codegen limitations: https://netflix.github.io/dgs/advanced/kotlin-codegen/
+    """
+    plane: Plane
 }
 
 type FlightEdge {
