@@ -23,6 +23,14 @@ class FlightRepository(private val jooqContext: DSLContext) {
     fun count(filter: FlightsFilter? = null): Int =
         jooqContext.selectCount().from(FLIGHTS).where(filter.toCondition()).fetchSingle(0, Int::class.java) ?: 0
 
+    fun getByIds(ids: Set<FlightId>): Map<FlightId, Flight> =
+        jooqContext
+            .select(DSL.asterisk())
+            .from(FLIGHTS)
+            .where(FLIGHTS.ID.`in`(ids))
+            .fetch { serializeFlight(it) }
+            .associateBy { it.id }
+
     private fun serializeFlight(record: Record): Flight =
         Flight(
             id = record[FLIGHTS.ID],

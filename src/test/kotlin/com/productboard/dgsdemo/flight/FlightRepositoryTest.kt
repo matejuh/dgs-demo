@@ -28,4 +28,10 @@ class FlightRepositoryTest : DgsDemoApplicationTests() {
     fun `Should get count with filter`() {
         assertThat(flightRepository.count(FlightsFilter(plane = "OK-6400"))).isEqualTo(4)
     }
+
+    @Test
+    fun `Should get by ids`() {
+        val ids = setOf(1, 2, 3)
+        assertThat(flightRepository.getByIds(ids)).hasSize(ids.size)
+    }
 }
