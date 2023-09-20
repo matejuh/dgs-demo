@@ -1,0 +1,23 @@
+type Plane {
+    sign: String!
+    type: String!
+}
+
+input AddPlaneInput {
+    sign: String!
+    type: String!
+}
+
+type AddPlaneSuccess {
+    plane: Plane!
+}
+
+type PlaneAlreadyExists {
+    plane: Plane!
+}
+
+union AddPlanePayload = AddPlaneSuccess | PlaneAlreadyExists
+
+type Mutation {
+    addPlane(input: AddPlaneInput!): AddPlanePayload!
+}
