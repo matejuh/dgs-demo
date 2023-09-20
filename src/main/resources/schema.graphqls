@@ -21,3 +21,62 @@ union AddPlanePayload = AddPlaneSuccess | PlaneAlreadyExists
 type Mutation {
     addPlane(input: AddPlaneInput!): AddPlanePayload!
 }
+
+interface Node {
+    id: ID!
+}
+
+type PageInfo {
+    startCursor: String
+    endCursor: String
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+}
+
+type PlaneEdge {
+    cursor: String!
+    node: Plane
+}
+
+type PlaneConnection {
+    edges: [PlaneEdge!]!
+    pageInfo: PageInfo!
+}
+
+scalar ISO8601DateTime
+scalar _FieldSet
+directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
+
+type Flight implements Node @key(fields: "id") {
+    id: ID!
+    """
+    Example of custom scalar
+    """
+    startTime: ISO8601DateTime!
+    landingTime: ISO8601DateTime!
+    planeSign: String!
+}
+
+type FlightEdge {
+    cursor: String!
+    """
+    Nullable is required to simplify the usage in the client.
+    """
+    node: Flight
+}
+
+type FlightConnection {
+    edges: [FlightEdge!]!
+    pageInfo: PageInfo!
+}
+
+input FlightsFilter {
+    plane: ID
+}
+
+type Query {
+    """
+    Returns paginated list of flights, optionally filtered. Pagination format in influenced by Relay: https://relay.dev/docs/tutorial/connections-pagination/
+    """
+    listFlights(first: Int = 10, after: String, filter: FlightsFilter): FlightConnection!
+}
