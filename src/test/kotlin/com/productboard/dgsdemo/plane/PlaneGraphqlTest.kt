@@ -25,4 +25,15 @@ class PlaneGraphqlTest : DgsDemoApplicationTests() {
             )
             .isEqualTo("OK-4832")
     }
+
+    @Test
+    fun `Should return already existing on add`() {
+        val mutation =
+            GraphQLQueryRequest(
+                AddPlaneGraphQLQuery.newRequest().input(AddPlaneInput(sign = "OK-7761", type = "Discus 2b")).build(),
+                AddPlaneProjectionRoot<Nothing, Nothing>().onPlaneAlreadyExists().plane().type()
+            )
+        assertThat(graphQLClient.executeQuery(mutation.serialize()).extractValue<String>("data.addPlane.plane.type"))
+            .isEqualTo("Duo Discus")
+    }
 }
